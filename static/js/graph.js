@@ -8,7 +8,7 @@ function makeGraphs(error, salaryData) {
     salaryData.forEach(function(d) {
         d.salary = parseInt(d.salary);
     })
-    /* "a funcion for plotting the charts" - video */
+    
     show_discipline_selector(ndx);
     show_gender_balance(ndx);
     show_average_salaries(ndx);
@@ -120,8 +120,25 @@ function show_rank_distribution(ndx) {
     var asstProfByGender = rankByGender(dim, "AsstProf");
     var assocProfByGender = rankByGender(dim, "AssocProf");
     
+    dc.barChart("#rank-distribution")
+        .width(400)
+        .height(300)
+        .dimension(dim)
+        .group(profByGender, "Prof")
+        .stack(asstProfByGender, "Asst Prof")
+        .stack(assocProfByGender, "Assoc Prof") 
+        .valueAccessor(function (d) {
+            if(d.value.total > 0) {
+                return (d.value.match / d.value.total) * 100; 
+            } else {
+                return 0;
+            }
+        })
+        .x(d3.scale.ordinal())
+        .xUnits(dc.units.ordinal)
+        .legend(dc.legend().x(320).y(20).itemHeight(15).gap(5))
+        .margins({top: 10, right: 100, bottom: 30, left: 30});
 }
-
 
 
 
