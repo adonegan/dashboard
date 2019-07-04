@@ -5,13 +5,13 @@ queue()
 function makeGraphs(error, salaryData) {
     var ndx = crossfilter(salaryData);
     
-    salaryData.forEach(function(d) {
+    salaryData.forEach(function(d){
         d.salary = parseInt(d.salary);
     })
     
     show_discipline_selector(ndx);
     show_gender_balance(ndx);
-    show_average_salaries(ndx);
+    show_average_salary(ndx);
     show_rank_distribution(ndx);
     
     dc.renderAll();
@@ -19,8 +19,8 @@ function makeGraphs(error, salaryData) {
 
 
 function show_discipline_selector(ndx) {
-    dim = ndx.dimension(dc.pluck('discipline'));
-    group = dim.group()
+    var dim = ndx.dimension(dc.pluck('discipline'));
+    var group = dim.group();
     
     dc.selectMenu("#discipline-selector")
         .dimension(dim)
@@ -45,7 +45,7 @@ function show_gender_balance(ndx) {
 }
 
 
-function show_average_salaries(ndx) {
+function show_average_salary(ndx) {
     var dim = ndx.dimension(dc.pluck('sex'));
     
     function add_item(p, v) {
@@ -73,14 +73,14 @@ function show_average_salaries(ndx) {
     
     var averageSalaryByGender = dim.group().reduce(add_item, remove_item, initialise);
     
+    dc.barChart("#average-salary")
     
-    dc.barChart("#average-salary") 
         .width(400)
         .height(300)
         .margins({top: 10, right: 50, bottom: 30, left: 50})
         .dimension(dim)
         .group(averageSalaryByGender)
-        .valueAccessor(function(d) {
+        .valueAccessor(function(d){
             return d.value.average.toFixed(2);
         })
         .transitionDuration(500)
@@ -93,7 +93,7 @@ function show_average_salaries(ndx) {
 
 function show_rank_distribution(ndx) {
     
-    function rankByGender (dimension, rank) {
+    function rankByGender(dimension, rank) {
         return dimension.group().reduce(
             function (p, v) {
                 p.total++;
@@ -116,7 +116,7 @@ function show_rank_distribution(ndx) {
     }
     
     var dim = ndx.dimension(dc.pluck("sex"));
-    var ProfByGender = rankByGender(dim, "Prof");
+    var profByGender = rankByGender(dim, "Prof");
     var asstProfByGender = rankByGender(dim, "AsstProf");
     var assocProfByGender = rankByGender(dim, "AssocProf");
     
@@ -126,10 +126,10 @@ function show_rank_distribution(ndx) {
         .dimension(dim)
         .group(profByGender, "Prof")
         .stack(asstProfByGender, "Asst Prof")
-        .stack(assocProfByGender, "Assoc Prof") 
+        .stack(assocProfByGender, "Assoc Prof")
         .valueAccessor(function (d) {
             if(d.value.total > 0) {
-                return (d.value.match / d.value.total) * 100; 
+                return (d.value.match / d.value.total) * 100;
             } else {
                 return 0;
             }
@@ -139,6 +139,3 @@ function show_rank_distribution(ndx) {
         .legend(dc.legend().x(320).y(20).itemHeight(15).gap(5))
         .margins({top: 10, right: 100, bottom: 30, left: 30});
 }
-
-
-
