@@ -8,10 +8,11 @@ function makeGraphs(error, salaryData) {
     salaryData.forEach(function(d) {
         d.salary = parseInt(d.salary);
     })
-    
+    /* "a funcion for plotting the charts" - video */
     show_discipline_selector(ndx);
     show_gender_balance(ndx);
     show_average_salaries(ndx);
+    show_rank_distribution(ndx);
     
     dc.renderAll();
 }
@@ -90,7 +91,36 @@ function show_average_salaries(ndx) {
         .yAxis().ticks(4);
 }
 
-
+function show_rank_distribution(ndx) {
+    
+    function rankByGender (dimension, rank) {
+        return dimension.group().reduce(
+            function (p, v) {
+                p.total++;
+                if(v.rank == rank) {
+                    p.match++;
+                }
+                return p;
+            },
+            function (p, v) {
+                p.total--;
+                if(v.rank == rank) {
+                    p.match--;
+                }
+                return p;
+            },
+            function () {
+                return {total: 0, match: 0};
+            }
+        );
+    }
+    
+    var dim = ndx.dimension(dc.pluck("sex"));
+    var ProfByGender = rankByGender(dim, "Prof");
+    var asstProfByGender = rankByGender(dim, "AsstProf");
+    var assocProfByGender = rankByGender(dim, "AssocProf");
+    
+}
 
 
 
