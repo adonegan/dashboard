@@ -188,9 +188,13 @@ function show_rank_distribution(ndx) {
 
 
 function show_service_to_salary_correlation(ndx) {
+    var genderColors = d3.scale.ordinal()
+        .domain(["Female", "Male"])
+        .range(["pink", "blue"]);
+    
     var eDim = ndx.dimension(dc.pluck("yrs_service"));
-    var experienceDim = ndx.dimension(function(d) {
-        return [d.yrs_service, d.salary];
+    var experienceDim = ndx.dimension(function(d){
+        return [d.yrs_service, d.salary, d.rank, d.sex];
     });
     var experienceSalaryGroup = experienceDim.group();
 
@@ -204,10 +208,15 @@ function show_service_to_salary_correlation(ndx) {
         .brushOn(false)
         .symbolSize(8)
         .clipPadding(10)
+        .yAxisLabel("Salary")
         .xAxisLabel("Years Of Service")
         .title(function(d){
-            return "Earned " + d.key[1];
+            return d.key[2] + " earned " + d.key[1];
         })
+        .colorAccessor(function(d){
+            return d.key[3];
+        })
+        .colors(genderColors)
         .dimension(experienceDim)
         .group(experienceSalaryGroup)
         .margins({top: 10, right: 50, bottom: 75, left: 75});
